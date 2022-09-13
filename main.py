@@ -5,6 +5,7 @@ from networkx.readwrite import json_graph
 
 serveradress = "127.0.0.1"
 serverport = 3000
+datafile = 'graph.txt'
 
 app = Flask(__name__)
 api = Api()
@@ -12,7 +13,7 @@ api = Api()
 
 class Main(Resource):
     def get(self, user_id):
-        social_graph = nx.read_gml('graph.txt')
+        social_graph = nx.read_gml(datafile)
         if user_id == '0':
             return json_graph.node_link_data(social_graph)
         if user_id in social_graph:
@@ -24,7 +25,7 @@ class Main(Resource):
             return "wrong user id"
 
     def post(self, user_id):
-        social_graph = nx.read_gml('graph.txt')
+        social_graph = nx.read_gml(datafile)
         parser = reqparse.RequestParser()
         parser.add_argument("contact_id", type=str)
         contact_id = parser.parse_args()["contact_id"]
@@ -32,7 +33,7 @@ class Main(Resource):
             social_graph[user_id][contact_id]['weight'] += 1
         else:
             social_graph.add_edge(user_id, contact_id, weight=1)
-        nx.write_gml(social_graph, 'graph.txt')
+        nx.write_gml(social_graph, datafile)
         return json_graph.node_link_data(social_graph)
 
 
